@@ -1,1 +1,1569 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quản Lý Bể Cá Pro+</title>
+  <style>
+    :root{
+      --bg:#07111f;
+      --panel:#0f1b2f;
+      --panel-2:#13233d;
+      --panel-3:#0b1628;
+      --text:#e5eefc;
+      --muted:#9cb0cc;
+      --line:#22324d;
+      --blue:#60a5fa;
+      --green:#34d399;
+      --yellow:#fbbf24;
+      --red:#f87171;
+      --cyan:#22d3ee;
+      --shadow:0 18px 40px rgba(0,0,0,.35);
+      --radius:20px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:linear-gradient(180deg,#06101d 0%,#081427 100%);
+      color:var(--text);
+    }
+    .app{
+      max-width:1600px;
+      margin:0 auto;
+      padding:18px;
+    }
+    .header{
+      display:flex;
+      gap:14px;
+      flex-wrap:wrap;
+      align-items:stretch;
+      margin-bottom:16px;
+    }
+    .hero, .stats, .toolbar, .panel, .card, .modal-content{
+      background:rgba(15,27,47,.92);
+      border:1px solid rgba(255,255,255,.05);
+      box-shadow:var(--shadow);
+      border-radius:var(--radius);
+    }
+    .hero{
+      flex:2 1 420px;
+      padding:18px 20px;
+      min-width:320px;
+      overflow:hidden;
+      position:relative;
+    }
+    .hero h1{margin:0 0 8px;font-size:26px}
+    .hero p{margin:0;color:var(--muted);line-height:1.5}
+    .hero .mini{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(90px,1fr));
+      gap:10px;
+      margin-top:16px;
+    }
+    .mini .box{
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px;
+    }
+    .mini .num{font-size:22px;font-weight:700}
+    .mini .lab{font-size:12px;color:var(--muted);margin-top:4px}
+    .stats{
+      flex:1 1 300px;
+      padding:16px;
+      min-width:290px;
+      display:grid;
+      gap:10px;
+      align-content:start;
+    }
+    .stat{
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px 14px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .stat b{font-size:16px}
+    .stat span{color:var(--muted)}
+    .toolbar{
+      padding:14px;
+      margin-bottom:16px;
+      display:grid;
+      grid-template-columns:repeat(12,1fr);
+      gap:10px;
+      align-items:center;
+    }
+    .toolbar input,.toolbar select,.toolbar button,
+    .modal-content input,.modal-content select,.modal-content textarea{
+      width:100%;
+      background:#071120;
+      color:var(--text);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:11px 12px;
+      outline:none;
+      font-size:14px;
+    }
+    .toolbar input::placeholder,.modal-content input::placeholder,.modal-content textarea::placeholder{color:#7286a7}
+    .toolbar button,.btn{
+      cursor:pointer;
+      border:none;
+      font-weight:700;
+    }
+    .btn-primary{background:linear-gradient(135deg,#2563eb,#60a5fa); color:#fff}
+    .btn-green{background:linear-gradient(135deg,#059669,#34d399); color:#fff}
+    .btn-yellow{background:linear-gradient(135deg,#b45309,#fbbf24); color:#111827}
+    .btn-red{background:linear-gradient(135deg,#b91c1c,#f87171); color:#fff}
+    .btn-dark{background:#10213a; color:#fff; border:1px solid var(--line)}
+    .toolbar .search{grid-column:span 3}
+    .toolbar .filter{grid-column:span 2}
+    .toolbar .small{grid-column:span 1}
+    .toolbar .wide{grid-column:span 2}
+    .toolbar .wide2{grid-column:span 4}
+    .toolbar .hint{grid-column:span 12;color:var(--muted);font-size:12px}
+    .content{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(380px,1fr));
+      gap:16px;
+    }
+    .card{overflow:hidden; position:relative;}
+    .card-head{
+      padding:16px 16px 12px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      justify-content:space-between;
+    }
+    .tank-title{margin:0;font-size:19px}
+    .sub{color:var(--muted);font-size:12px;margin-top:6px;line-height:1.35}
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:7px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      white-space:nowrap;
+    }
+    .good{background:rgba(52,211,153,.15);color:#86efac;border:1px solid rgba(52,211,153,.3)}
+    .warn{background:rgba(251,191,36,.14);color:#fcd34d;border:1px solid rgba(251,191,36,.3)}
+    .bad{background:rgba(248,113,113,.15);color:#fca5a5;border:1px solid rgba(248,113,113,.3)}
+    .card-body{padding:14px 16px 16px;display:grid;gap:12px}
+    .grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .metric, .section, .logbox, .taskbox, .noteBox{
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px;
+    }
+    .metric .k{color:var(--muted);font-size:12px}
+    .metric .v{font-size:20px;font-weight:800;margin-top:4px}
+    .meter{height:9px;background:#0a1322;border-radius:999px;overflow:hidden;margin-top:10px;border:1px solid #1e2c45}
+    .fill{height:100%;border-radius:999px}
+    .f-blue{background:linear-gradient(90deg,#2563eb,#60a5fa)}
+    .f-green{background:linear-gradient(90deg,#059669,#34d399)}
+    .f-yellow{background:linear-gradient(90deg,#b45309,#fbbf24)}
+    .f-red{background:linear-gradient(90deg,#b91c1c,#f87171)}
+    .f-cyan{background:linear-gradient(90deg,#0891b2,#22d3ee)}
+    .section h3, .taskbox h3, .logbox h3, .noteBox h3{margin:0 0 10px;font-size:15px}
+    .controls{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+    }
+    .controls .full{grid-column:1/-1}
+    .row{
+      display:flex;gap:8px;flex-wrap:wrap;align-items:center
+    }
+    .row > *{flex:1 1 120px}
+    .row .fit{flex:0 0 auto}
+    .range{
+      width:100%;
+      accent-color:#60a5fa;
+    }
+    .tiny{font-size:12px;color:var(--muted)}
+    .actions{display:flex;flex-wrap:wrap;gap:8px}
+    .actions button{padding:10px 12px;border-radius:12px}
+    .logbox, .taskbox, .noteBox{max-height:220px;overflow:auto}
+    .logitem, .taskitem, .noteitem{
+      padding:8px 0;
+      border-bottom:1px dashed rgba(255,255,255,.08);
+      font-size:13px;
+      color:#d8e5f9;
+    }
+    .logitem:last-child,.taskitem:last-child,.noteitem:last-child{border-bottom:none}
+    .taskitem.done{opacity:.55;text-decoration:line-through}
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      border-radius:999px;
+      padding:5px 8px;
+      background:#071120;
+      border:1px solid var(--line);
+      color:#c8d8f2;
+      font-size:12px;
+      margin-left:8px;
+    }
+    .list-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .list-actions button{padding:8px 10px;border-radius:10px}
+    .empty{
+      color:var(--muted);
+      font-size:14px;
+      text-align:center;
+      padding:14px 10px;
+    }
+    .footer-tools{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:12px;
+    }
+    .panel{padding:14px}
+    .panel h3{margin:0 0 12px;font-size:16px}
+    .modal{
+      position:fixed;inset:0;background:rgba(0,0,0,.58);
+      display:none;align-items:center;justify-content:center;
+      padding:18px; z-index:50;
+    }
+    .modal.show{display:flex}
+    .modal-content{
+      width:min(880px,100%);
+      max-height:90vh;
+      overflow:auto;
+      padding:16px;
+    }
+    .modal-header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+    .modal-header h2{margin:0;font-size:20px}
+    .form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+    .form-grid .span2{grid-column:span 2}
+    .form-grid .span3{grid-column:span 3}
+    textarea{min-height:88px;resize:vertical}
+    .divider{height:1px;background:var(--line);margin:12px 0}
+    .tag{display:inline-block;padding:4px 8px;border-radius:999px;background:#071120;border:1px solid var(--line);font-size:12px;color:#bdd2f5;margin-right:6px;margin-top:6px}
+    .toggle{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 10px;border-radius:12px;border:1px solid var(--line);background:#071120;
+      cursor:pointer; user-select:none;
+    }
+    .toggle input{width:auto}
+    @media (max-width:980px){
+      .toolbar{grid-template-columns:repeat(6,1fr)}
+      .toolbar .search{grid-column:span 6}
+      .toolbar .filter{grid-column:span 3}
+      .toolbar .wide{grid-column:span 3}
+      .toolbar .wide2{grid-column:span 6}
+      .toolbar .small{grid-column:span 2}
+      .form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .form-grid .span2,.form-grid .span3{grid-column:span 2}
+    }
+    @media (max-width:640px){
+      .mini{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
+      .toolbar{grid-template-columns:repeat(2,1fr)}
+      .toolbar .search,.toolbar .filter,.toolbar .wide,.toolbar .wide2,.toolbar .small{grid-column:span 2}
+      .grid-2,.controls,.form-grid{grid-template-columns:1fr}
+      .form-grid .span2,.form-grid .span3{grid-column:span 1}
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="hero">
+      <h1>🐟 Dashboard Quản Lý Bể Cá Pro+</h1>
+      <p>Quản lý nhiều bể cùng lúc, chỉnh thông số trực tiếp, ghi log, đặt việc cần làm, cảnh báo tự động, sao lưu dữ liệu và xuất nhập JSON.</p>
+      <div class="mini" id="miniSummary"></div>
+    </div>
+    <div class="stats" id="globalStats"></div>
+  </div>
 
+  <div class="toolbar">
+    <input class="search" id="searchInput" placeholder="Tìm bể, loại cá, ghi chú..." />
+    <select class="filter" id="speciesFilter"></select>
+    <select class="filter" id="statusFilter">
+      <option value="all">Tất cả trạng thái</option>
+      <option value="good">Ổn định</option>
+      <option value="warn">Cảnh báo</option>
+      <option value="bad">Nguy hiểm</option>
+    </select>
+    <select class="small" id="sortBy">
+      <option value="name">Tên</option>
+      <option value="status">Trạng thái</option>
+      <option value="temp">Nhiệt độ</option>
+      <option value="ph">pH</option>
+      <option value="ammonia">NH3</option>
+      <option value="fish">Số cá</option>
+    </select>
+    <button class="btn-primary wide" id="addTankBtn">+ Thêm bể</button>
+    <button class="btn-dark wide" id="backupBtn">Sao lưu JSON</button>
+    <button class="btn-dark wide" id="restoreBtn">Nhập JSON</button>
+    <button class="btn-yellow wide" id="resetBtn">Khôi phục mẫu</button>
+    <input type="file" id="fileInput" accept="application/json" hidden />
+    <div class="hint">Mọi thay đổi sẽ tự lưu vào trình duyệt bằng localStorage.</div>
+  </div>
+
+  <div class="content" id="tankList"></div>
+
+  <div class="footer-tools">
+    <div class="panel">
+      <h3>Tiện ích nhanh</h3>
+      <div class="row">
+        <button class="btn-green" id="feedAllBtn">Cho ăn tất cả</button>
+        <button class="btn-blue btn" id="waterAllBtn" style="background:linear-gradient(135deg,#0ea5e9,#22d3ee);color:#06111f;">Thay nước nhanh</button>
+        <button class="btn-red" id="alertAllBtn">Tạo cảnh báo mẫu</button>
+      </div>
+      <div class="divider"></div>
+      <div class="tiny">Bạn có thể dùng đây như một bảng điều khiển mini cho trại cá, bể RAS, bể cá cảnh hoặc bể ương.</div>
+    </div>
+    <div class="panel">
+      <h3>Thông số khuyến nghị</h3>
+      <div class="tiny" id="recommendBox"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="tankModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="modalTitle">Thêm bể</h2>
+      <button class="btn-dark fit" id="closeModalBtn">Đóng</button>
+    </div>
+    <div class="form-grid">
+      <input id="fName" class="span2" placeholder="Tên bể" />
+      <select id="fType"></select>
+      <input id="fSpecies" placeholder="Loài cá / đối tượng nuôi" />
+      <input id="fVolume" type="number" placeholder="Dung tích (L)" />
+      <input id="fStock" type="number" placeholder="Số lượng cá" />
+      <input id="fTemp" type="number" step="0.1" placeholder="Nhiệt độ (°C)" />
+      <input id="fPH" type="number" step="0.1" placeholder="pH" />
+      <input id="fOxygen" type="number" step="0.1" placeholder="Oxy hòa tan (%)" />
+      <input id="fAmmo" type="number" step="0.1" placeholder="NH3/NH4 (ppm)" />
+      <input id="fNO2" type="number" step="0.1" placeholder="NO2 (ppm)" />
+      <input id="fNO3" type="number" step="0.1" placeholder="NO3 (ppm)" />
+      <input id="fTDS" type="number" step="1" placeholder="TDS" />
+      <input id="fFeed" type="number" step="1" placeholder="Thức ăn tồn (%)" />
+      <input id="fDays" type="number" step="1" placeholder="Ngày chạy bể" />
+      <input id="fFilter" class="span2" placeholder="Hệ lọc / thiết bị lọc" />
+      <textarea id="fNote" class="span3" placeholder="Ghi chú bể, mục tiêu, đặc điểm..." ></textarea>
+      <div class="toggle"><input id="fLight" type="checkbox" /> <label for="fLight">Đèn</label></div>
+      <div class="toggle"><input id="fPump" type="checkbox" /> <label for="fPump">Máy bơm</label></div>
+      <div class="toggle"><input id="fHeater" type="checkbox" /> <label for="fHeater">Sưởi</label></div>
+      <div class="toggle"><input id="fUV" type="checkbox" /> <label for="fUV">UV</label></div>
+      <div class="toggle"><input id="fAir" type="checkbox" /> <label for="fAir">Sủi oxy</label></div>
+      <div class="toggle"><input id="fCO2" type="checkbox" /> <label for="fCO2">CO₂</label></div>
+      <div class="span3 row" style="margin-top:4px">
+        <button class="btn-primary" id="saveTankBtn">Lưu bể</button>
+        <button class="btn-dark" id="clearFormBtn">Xóa form</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const STORAGE_KEY = 'aquarium_manager_pro_plus_v1';
+  const TYPES = ['Cá Lóc','Betta','Cichlid','Thủy Sinh','Cá Dĩa','Koi','Trùng chỉ','Ốc / tép','Khác'];
+  const RECOMMEND = {
+    'Cá Lóc': {temp:'26–30°C', ph:'6.5–7.5', oxygen:'>70%', ammo:'<0.25 ppm'},
+    'Betta': {temp:'25–29°C', ph:'6.5–7.5', oxygen:'>50%', ammo:'<0.20 ppm'},
+    'Cichlid': {temp:'24–28°C', ph:'7.0–8.2', oxygen:'>65%', ammo:'<0.25 ppm'},
+    'Thủy Sinh': {temp:'22–28°C', ph:'6.0–7.4', oxygen:'>60%', ammo:'<0.10 ppm'},
+    'Cá Dĩa': {temp:'28–30°C', ph:'6.0–6.8', oxygen:'>70%', ammo:'<0.15 ppm'},
+    'Koi': {temp:'18–24°C', ph:'7.0–8.0', oxygen:'>70%', ammo:'<0.25 ppm'},
+    'Trùng chỉ': {temp:'20–26°C', ph:'6.5–7.5', oxygen:'>50%', ammo:'<0.50 ppm'},
+    'Ốc / tép': {temp:'22–28°C', ph:'6.8–7.6', oxygen:'>60%', ammo:'<0.10 ppm'},
+    'Khác': {temp:'Tùy loài', ph:'Tùy loài', oxygen:'Tùy loài', ammo:'Tùy loài'}
+  };
+
+  const $ = (id)=>document.getElementById(id);
+  const tankList = $('tankList');
+  const globalStats = $('globalStats');
+  const miniSummary = $('miniSummary');
+  const speciesFilter = $('speciesFilter');
+  const statusFilter = $('statusFilter');
+  const sortBy = $('sortBy');
+  const searchInput = $('searchInput');
+  const recommendBox = $('recommendBox');
+  const modal = $('tankModal');
+  const modalTitle = $('modalTitle');
+  const fileInput = $('fileInput');
+
+  let tanks = load();
+  let editingIndex = null;
+  let editId = null;
+
+  seedIfEmpty();
+  setupTypeSelects();
+  bindUI();
+  render();
+  autosim();
+
+  function seedIfEmpty(){
+    if(tanks.length) return;
+    tanks = [
+      makeTank({name:'Bể Cá Lóc A', type:'Cá Lóc', species:'Channa', volume:120, stock:12, temp:28, ph:7.1, oxygen:82, ammo:0.08, no2:0.03, no3:12, tds:180, feed:65, days:24, filter:'Lọc tràn + bông + vi sinh', note:'Bể nuôi ổn định', light:true, pump:true, heater:false, uv:false, air:true, co2:false}),
+      makeTank({name:'Bể Betta Trống', type:'Betta', species:'Betta splendens', volume:45, stock:8, temp:27, ph:6.8, oxygen:68, ammo:0.05, no2:0.02, no3:8, tds:140, feed:80, days:17, filter:'Mút vi sinh', note:'Nuôi riêng từng ô', light:true, pump:true, heater:true, uv:false, air:true, co2:false}),
+      makeTank({name:'Bể Trùng Chỉ', type:'Trùng chỉ', species:'Tubifex', volume:60, stock:0, temp:24, ph:6.9, oxygen:75, ammo:0.18, no2:0.04, no3:16, tds:210, feed:90, days:9, filter:'Sủi nhẹ + lọc bông', note:'Dùng làm thức ăn cho bể cá lóc', light:false, pump:true, heater:false, uv:false, air:true, co2:false})
+    ];
+    save();
+  }
+
+  function makeTank(data={}){
+    return {
+      id: data.id || cryptoId(),
+      name: data.name || 'Bể mới',
+      type: data.type || 'Khác',
+      species: data.species || '',
+      volume: num(data.volume, 100),
+      stock: num(data.stock, 0),
+      temp: num(data.temp, 27),
+      ph: num(data.ph, 7.0),
+      oxygen: num(data.oxygen, 75),
+      ammo: num(data.ammo, 0.1),
+      no2: num(data.no2, 0.05),
+      no3: num(data.no3, 10),
+      tds: num(data.tds, 160),
+      feed: num(data.feed, 70),
+      days: num(data.days, 0),
+      filter: data.filter || 'Chưa thiết lập',
+      note: data.note || '',
+      light: !!data.light,
+      pump: data.pump !== false,
+      heater: !!data.heater,
+      uv: !!data.uv,
+      air: data.air !== false,
+      co2: !!data.co2,
+      tasks: Array.isArray(data.tasks) ? data.tasks : [],
+      logs: Array.isArray(data.logs) ? data.logs : [],
+      createdAt: data.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+  }
+
+  function cryptoId(){
+    return 't_' + Math.random().toString(36).slice(2,10) + Date.now().toString(36);
+  }
+
+  function num(v, fallback){
+    const n = Number(v);
+    return Number.isFinite(n) ? n : fallback;
+  }
+
+  function load(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed.map(t => makeTank(t)) : [];
+    }catch(e){
+      return [];
+    }
+  }
+
+  function save(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tanks));
+  }
+
+  function bindUI(){
+    $('addTankBtn').onclick = ()=>openModal();
+    $('closeModalBtn').onclick = closeModal;
+    $('saveTankBtn').onclick = saveTankFromModal;
+    $('clearFormBtn').onclick = clearForm;
+    $('backupBtn').onclick = exportJSON;
+    $('restoreBtn').onclick = ()=>fileInput.click();
+    $('resetBtn').onclick = ()=>{
+      if(confirm('Khôi phục dữ liệu mẫu? Dữ liệu hiện tại sẽ bị thay thế.')){
+        localStorage.removeItem(STORAGE_KEY);
+        tanks = [];
+        seedIfEmpty();
+        render();
+      }
+    };
+    $('feedAllBtn').onclick = ()=>{
+      tanks.forEach(t=>{t.feed = 100; log(t,'Cho ăn tất cả: thức ăn đã nạp đầy'); t.updatedAt = new Date().toISOString();});
+      save(); render();
+    };
+    $('waterAllBtn').onclick = ()=>{
+      tanks.forEach(t=>{applyWaterChange(t, 20); t.updatedAt = new Date().toISOString();});
+      save(); render();
+    };
+    $('alertAllBtn').onclick = ()=>{
+      tanks.forEach(t=>{log(t,'⚠ Cảnh báo mẫu: kiểm tra chất lượng nước và thiết bị');});
+      save(); render();
+    };
+    searchInput.oninput = render;
+    speciesFilter.onchange = render;
+    statusFilter.onchange = render;
+    sortBy.onchange = render;
+    fileInput.onchange = importJSON;
+    window.addEventListener('keydown', (e)=>{
+      if(e.key === 'Escape') closeModal();
+    });
+    modal.addEventListener('click', (e)=>{
+      if(e.target === modal) closeModal();
+    });
+  }
+
+  function setupTypeSelects(){
+    speciesFilter.innerHTML = '<option value="all">Tất cả loài</option>' + TYPES.map(t=>`<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
+    $('fType').innerHTML = TYPES.map(t=>`<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
+  }
+
+  function render(){
+    tanks = tanks.map(t=>({ ...t, alerts: evaluateAlerts(t) }));
+    save();
+    renderGlobal();
+    renderRecommend();
+    renderList();
+  }
+
+  function renderGlobal(){
+    const count = tanks.length;
+    const stable = tanks.filter(t=>statusLevel(t) === 'good').length;
+    const warn = tanks.filter(t=>statusLevel(t) === 'warn').length;
+    const bad = tanks.filter(t=>statusLevel(t) === 'bad').length;
+    const totalFish = tanks.reduce((s,t)=>s + num(t.stock,0),0);
+    const totalVol = tanks.reduce((s,t)=>s + num(t.volume,0),0);
+    const avgPh = count ? (tanks.reduce((s,t)=>s + num(t.ph,0),0) / count).toFixed(2) : '0.00';
+    const avgTemp = count ? (tanks.reduce((s,t)=>s + num(t.temp,0),0) / count).toFixed(1) : '0.0';
+
+    globalStats.innerHTML = `
+      <div class="stat"><div><b>${count}</b><br><span>Tổng bể</span></div><span>🏷</span></div>
+      <div class="stat"><div><b>${totalFish}</b><br><span>Tổng cá / sinh vật</span></div><span>🐠</span></div>
+      <div class="stat"><div><b>${totalVol}L</b><br><span>Tổng dung tích</span></div><span>🫙</span></div>
+      <div class="stat"><div><b>${avgTemp}°C</b><br><span>Nhiệt độ TB</span></div><span>🌡</span></div>
+      <div class="stat"><div><b>${avgPh}</b><br><span>pH TB</span></div><span>🧪</span></div>
+      <div class="stat"><div><b>${stable}</b><br><span>Ổn định</span></div><span class="badge good">OK</span></div>
+      <div class="stat"><div><b>${warn}</b><br><span>Cảnh báo</span></div><span class="badge warn">WARN</span></div>
+      <div class="stat"><div><b>${bad}</b><br><span>Nguy hiểm</span></div><span class="badge bad">BAD</span></div>
+    `;
+
+    miniSummary.innerHTML = `
+      <div class="box"><div class="num">${count}</div><div class="lab">Bể đang theo dõi</div></div>
+      <div class="box"><div class="num">${stable}</div><div class="lab">Bể ổn định</div></div>
+      <div class="box"><div class="num">${warn + bad}</div><div class="lab">Bể cần kiểm tra</div></div>
+      <div class="box"><div class="num">${tanks.reduce((s,t)=>s + t.tasks.filter(x=>!x.done).length,0)}</div><div class="lab">Việc còn mở</div></div>
+    `;
+  }
+
+  function renderRecommend(){
+    const type = speciesFilter.value !== 'all' ? speciesFilter.value : (tanks[0]?.type || 'Khác');
+    const r = RECOMMEND[type] || RECOMMEND['Khác'];
+    recommendBox.innerHTML = `
+      <div><span class="tag">${escapeHtml(type)}</span></div>
+      <div style="margin-top:10px">Nhiệt độ: <b>${r.temp}</b></div>
+      <div>pH: <b>${r.ph}</b></div>
+      <div>Oxy: <b>${r.oxygen}</b></div>
+      <div>NH3/NH4: <b>${r.ammo}</b></div>
+      <div style="margin-top:10px;color:var(--muted)">Dùng làm mốc tham khảo nhanh khi chỉnh từng bể.</div>
+    `;
+  }
+
+  function renderList(){
+    const q = searchInput.value.trim().toLowerCase();
+    const species = speciesFilter.value;
+    const st = statusFilter.value;
+    let list = tanks.filter(t => {
+      const hay = `${t.name} ${t.type} ${t.species} ${t.note} ${t.filter}`.toLowerCase();
+      const okQ = !q || hay.includes(q);
+      const okS = species === 'all' || t.type === species;
+      const okSt = st === 'all' || statusLevel(t) === st;
+      return okQ && okS && okSt;
+    });
+
+    const sort = sortBy.value;
+    list.sort((a,b)=>{
+      if(sort === 'name') return a.name.localeCompare(b.name, 'vi');
+      if(sort === 'status') return severityRank(statusLevel(a)) - severityRank(statusLevel(b));
+      if(sort === 'temp') return num(a.temp,0) - num(b.temp,0);
+      if(sort === 'ph') return num(a.ph,0) - num(b.ph,0);
+      if(sort === 'ammonia') return num(a.ammo,0) - num(b.ammo,0);
+      if(sort === 'fish') return num(b.stock,0) - num(a.stock,0);
+      return 0;
+    });
+
+    if(!list.length){
+      tankList.innerHTML = `<div class="panel" style="grid-column:1/-1"><div class="empty">Không có bể phù hợp với bộ lọc hiện tại.</div></div>`;
+      return;
+    }
+
+    tankList.innerHTML = list.map(t => tankCard(t)).join('');
+  }
+
+  function tankCard(t){
+    const status = statusLevel(t);
+    const statusLabel = status === 'good' ? 'Ổn định' : status === 'warn' ? 'Cảnh báo' : 'Nguy hiểm';
+    const alertText = t.alerts.length ? t.alerts.slice(0,3).join(' • ') : 'Mọi thứ đang ổn';
+    const recommendation = RECOMMEND[t.type] || RECOMMEND['Khác'];
+    return `
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h2 class="tank-title">${escapeHtml(t.name)}</h2>
+            <div class="sub">
+              <span class="tag">${escapeHtml(t.type)}</span>
+              ${t.species ? `<span class="tag">${escapeHtml(t.species)}</span>` : ''}
+              <span class="tag">${num(t.volume,0)} L</span>
+              <span class="tag">${num(t.stock,0)} con / sinh vật</span>
+            </div>
+          </div>
+          <div class="badge ${status}">${statusLabel}</div>
+        </div>
+        <div class="card-body">
+          <div class="grid-2">
+            ${metric('Nhiệt độ', `${fmt(t.temp,1)}°C`, clampPct(t.temp, 15, 40), 'f-red')}
+            ${metric('pH', fmt(t.ph,1), clampPct(t.ph, 4, 10), 'f-blue')}
+            ${metric('Oxy', `${fmt(t.oxygen,1)}%`, clampPct(t.oxygen, 0, 100), 'f-green')}
+            ${metric('NH3/NH4', `${fmt(t.ammo,2)} ppm`, clampPctReverse(t.ammo, 0, 1), 'f-yellow')}
+            ${metric('NO2', `${fmt(t.no2,2)} ppm`, clampPctReverse(t.no2, 0, 1), 'f-yellow')}
+            ${metric('NO3', `${fmt(t.no3,1)} ppm`, clampPctReverse(t.no3, 0, 100), 'f-cyan')}
+            ${metric('TDS', `${fmt(t.tds,0)}`, clampPct(t.tds, 50, 500), 'f-cyan')}
+            ${metric('Thức ăn', `${fmt(t.feed,0)}%`, clampPct(t.feed, 0, 100), 'f-green')}
+          </div>
+
+          <div class="section">
+            <h3>Điều chỉnh nhanh</h3>
+            <div class="controls">
+              ${rangeControl(t.id, 'temp', 'Nhiệt độ', t.temp, 15, 40, 0.1, '°C')}
+              ${rangeControl(t.id, 'ph', 'pH', t.ph, 4, 10, 0.1, '')}
+              ${rangeControl(t.id, 'oxygen', 'Oxy', t.oxygen, 0, 100, 0.1, '%')}
+              ${rangeControl(t.id, 'ammo', 'NH3/NH4', t.ammo, 0, 2, 0.01, 'ppm')}
+              ${rangeControl(t.id, 'no2', 'NO2', t.no2, 0, 2, 0.01, 'ppm')}
+              ${rangeControl(t.id, 'no3', 'NO3', t.no3, 0, 200, 1, 'ppm')}
+              ${rangeControl(t.id, 'tds', 'TDS', t.tds, 50, 800, 1, '')}
+              ${rangeControl(t.id, 'feed', 'Thức ăn', t.feed, 0, 100, 1, '%')}
+            </div>
+          </div>
+
+          <div class="section">
+            <h3>Thiết bị & trạng thái</h3>
+            <div class="row">
+              ${deviceToggle(t.id, 'light', 'Đèn', t.light)}
+              ${deviceToggle(t.id, 'pump', 'Bơm', t.pump)}
+              ${deviceToggle(t.id, 'heater', 'Sưởi', t.heater)}
+              ${deviceToggle(t.id, 'uv', 'UV', t.uv)}
+              ${deviceToggle(t.id, 'air', 'Sủi', t.air)}
+              ${deviceToggle(t.id, 'co2', 'CO₂', t.co2)}
+            </div>
+            <div class="tiny" style="margin-top:8px">Mốc khuyến nghị: ${recommendation.temp} • ${recommendation.ph} • ${recommendation.oxygen} • ${recommendation.ammo}</div>
+          </div>
+
+          <div class="section">
+            <h3>Tiện ích thao tác</h3>
+            <div class="actions">
+              <button class="btn-green" onclick="feedTank('${t.id}')">Cho ăn</button>
+              <button class="btn" style="background:linear-gradient(135deg,#0ea5e9,#22d3ee);color:#06111f" onclick="waterChange('${t.id}')">Thay nước</button>
+              <button class="btn-yellow" onclick="addTask('${t.id}')">Thêm việc</button>
+              <button class="btn-dark" onclick="openEdit('${t.id}')">Chỉnh bể</button>
+              <button class="btn-red" onclick="deleteTank('${t.id}')">Xóa bể</button>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="logbox">
+              <h3>Log gần đây</h3>
+              ${renderLogs(t)}
+            </div>
+            <div class="taskbox">
+              <h3>Việc cần làm</h3>
+              ${renderTasks(t)}
+            </div>
+          </div>
+
+          <div class="noteBox">
+            <h3>Ghi chú & nhận xét</h3>
+            <div class="tiny">${escapeHtml(t.note || 'Chưa có ghi chú')}</div>
+            <div class="tiny" style="margin-top:8px;color:#9fb4cf">Cảnh báo: ${escapeHtml(alertText)}</div>
+          </div>
+
+          <div class="list-actions">
+            <button class="btn-dark" onclick="duplicateTank('${t.id}')">Nhân bản</button>
+            <button class="btn-dark" onclick="exportTank('${t.id}')">Xuất bể</button>
+            <button class="btn-dark" onclick="quickAdjust('${t.id}')">Tự động cân chỉnh</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function metric(label, value, pct, cls){
+    return `
+      <div class="metric">
+        <div class="k">${escapeHtml(label)}</div>
+        <div class="v">${escapeHtml(value)}</div>
+        <div class="meter"><div class="fill ${cls}" style="width:${pct}%"></div></div>
+      </div>
+    `;
+  }
+
+  function rangeControl(id, key, label, value, min, max, step, unit){
+    return `
+      <div class="metric full">
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <div class="k">${escapeHtml(label)}</div>
+          <div class="v" style="font-size:16px">${fmt(value, step < 1 ? 2 : 0)}${escapeHtml(unit)}</div>
+        </div>
+        <input class="range" type="range" min="${min}" max="${max}" step="${step}" value="${value}" oninput="setValue('${id}','${key}', this.value)" />
+      </div>
+    `;
+  }
+
+  function deviceToggle(id, key, label, on){
+    return `
+      <button class="btn-dark" onclick="toggleDevice('${id}','${key}')" style="min-width:110px">
+        ${escapeHtml(label)}: <b style="color:${on ? 'var(--green)' : 'var(--red)'}">${on ? 'ON' : 'OFF'}</b>
+      </button>
+    `;
+  }
+
+  function renderLogs(t){
+    if(!t.logs.length) return '<div class="empty">Chưa có log</div>';
+    return t.logs.slice(0,8).map(x=>`<div class="logitem">${escapeHtml(x)}</div>`).join('');
+  }
+
+  function renderTasks(t){
+    if(!t.tasks.length) return '<div class="empty">Chưa có việc nào</div>';
+    return t.tasks.slice(0,8).map(task=>`
+      <div class="taskitem ${task.done ? 'done' : ''}">
+        <label style="display:flex;gap:8px;align-items:flex-start;cursor:pointer">
+          <input type="checkbox" ${task.done ? 'checked' : ''} onchange="toggleTask('${t.id}','${task.id}')" />
+          <span>${escapeHtml(task.text)}${task.due ? `<span class="pill">Hạn: ${escapeHtml(task.due)}</span>` : ''}</span>
+        </label>
+      </div>
+    `).join('');
+  }
+
+  function openModal(tank=null){
+    editingIndex = null;
+    editId = tank?.id || null;
+    modalTitle.textContent = tank ? 'Chỉnh sửa bể' : 'Thêm bể';
+    fillForm(tank);
+    modal.classList.add('show');
+  }
+
+  function closeModal(){
+    modal.classList.remove('show');
+    editingIndex = null;
+    editId = null;
+  }
+
+  function fillForm(t){
+    const d = t || {};
+    $('fName').value = d.name || '';
+    $('fType').value = d.type || 'Khác';
+    $('fSpecies').value = d.species || '';
+    $('fVolume').value = d.volume ?? 100;
+    $('fStock').value = d.stock ?? 0;
+    $('fTemp').value = d.temp ?? 27;
+    $('fPH').value = d.ph ?? 7;
+    $('fOxygen').value = d.oxygen ?? 75;
+    $('fAmmo').value = d.ammo ?? 0.1;
+    $('fNO2').value = d.no2 ?? 0.05;
+    $('fNO3').value = d.no3 ?? 10;
+    $('fTDS').value = d.tds ?? 160;
+    $('fFeed').value = d.feed ?? 70;
+    $('fDays').value = d.days ?? 0;
+    $('fFilter').value = d.filter || '';
+    $('fNote').value = d.note || '';
+    $('fLight').checked = !!d.light;
+    $('fPump').checked = d.pump !== false;
+    $('fHeater').checked = !!d.heater;
+    $('fUV').checked = !!d.uv;
+    $('fAir').checked = d.air !== false;
+    $('fCO2').checked = !!d.co2;
+  }
+
+  function clearForm(){
+    fillForm({type:'Khác'});
+  }
+
+  function saveTankFromModal(){
+    const tankData = makeTank({
+      id: editId || undefined,
+      name: $('fName').value.trim() || 'Bể chưa đặt tên',
+      type: $('fType').value,
+      species: $('fSpecies').value.trim(),
+      volume: $('fVolume').value,
+      stock: $('fStock').value,
+      temp: $('fTemp').value,
+      ph: $('fPH').value,
+      oxygen: $('fOxygen').value,
+      ammo: $('fAmmo').value,
+      no2: $('fNO2').value,
+      no3: $('fNO3').value,
+      tds: $('fTDS').value,
+      feed: $('fFeed').value,
+      days: $('fDays').value,
+      filter: $('fFilter').value.trim(),
+      note: $('fNote').value.trim(),
+      light: $('fLight').checked,
+      pump: $('fPump').checked,
+      heater: $('fHeater').checked,
+      uv: $('fUV').checked,
+      air: $('fAir').checked,
+      co2: $('fCO2').checked
+    });
+
+    const idx = tanks.findIndex(t => t.id === tankData.id);
+    if(idx >= 0){
+      tankData.logs = tanks[idx].logs;
+      tankData.tasks = tanks[idx].tasks;
+      tankData.createdAt = tanks[idx].createdAt;
+      tankData.logs.unshift(`[${new Date().toLocaleString('vi-VN')}] Đã cập nhật bể bằng form`);
+      tanks[idx] = tankData;
+      log(tanks[idx], 'Đã lưu thay đổi từ form');
+    }else{
+      tankData.logs.unshift(`[${new Date().toLocaleString('vi-VN')}] Đã tạo bể mới`);
+      tanks.unshift(tankData);
+    }
+    save();
+    closeModal();
+    render();
+  }
+
+  function openEdit(id){
+    const t = findTank(id);
+    if(!t) return;
+    openModal(t);
+  }
+
+  function addTank(){
+    openModal();
+  }
+
+  function findTank(id){
+    return tanks.find(t => t.id === id);
+  }
+
+  function setValue(id, key, raw){
+    const t = findTank(id);
+    if(!t) return;
+    t[key] = key === 'ph' || key === 'temp' || key === 'oxygen' || key === 'ammo' || key === 'no2' || key === 'no3' || key === 'tds' || key === 'feed' ? Number(raw) : raw;
+    t.updatedAt = new Date().toISOString();
+    log(t, `Chỉnh ${prettyKey(key)} = ${fmt(t[key], key === 'ammo' || key === 'no2' ? 2 : 1)}`);
+    save(); render();
+  }
+
+  function toggleDevice(id, key){
+    const t = findTank(id);
+    if(!t) return;
+    t[key] = !t[key];
+    t.updatedAt = new Date().toISOString();
+    log(t, `${prettyKey(key)}: ${t[key] ? 'ON' : 'OFF'}`);
+    save(); render();
+  }
+
+  function feedTank(id){
+    const t = findTank(id); if(!t) return;
+    t.feed = 100;
+    t.no3 = Math.max(0, t.no3 + 1.2);
+    t.updatedAt = new Date().toISOString();
+    log(t, 'Cho ăn, thức ăn đã nạp đầy');
+    save(); render();
+  }
+
+  function waterChange(id){
+    const t = findTank(id); if(!t) return;
+    applyWaterChange(t, 25);
+    t.updatedAt = new Date().toISOString();
+    save(); render();
+  }
+
+  function applyWaterChange(t, percent){
+    const p = clamp(percent, 0, 100) / 100;
+    t.ammo = round2(t.ammo * (1 - p * 0.85));
+    t.no2 = round2(t.no2 * (1 - p * 0.75));
+    t.no3 = round2(t.no3 * (1 - p * 0.6));
+    t.tds = Math.max(0, Math.round(t.tds * (1 - p * 0.25)));
+    t.oxygen = Math.min(100, round1(t.oxygen + 6 + p * 10));
+    t.feed = Math.max(0, Math.round(t.feed - 10));
+    log(t, `Thay nước nhanh ${percent}%`);
+  }
+
+  function addTask(id){
+    const t = findTank(id); if(!t) return;
+    const text = prompt('Nhập việc cần làm cho bể này:');
+    if(!text || !text.trim()) return;
+    const due = prompt('Ngày hẹn (không bắt buộc, ví dụ 2026-05-30):') || '';
+    t.tasks.unshift({ id: cryptoId(), text: text.trim(), done:false, due: due.trim() });
+    log(t, `Thêm việc: ${text.trim()}`);
+    save(); render();
+  }
+
+  function toggleTask(id, taskId){
+    const t = findTank(id); if(!t) return;
+    const task = t.tasks.find(x => x.id === taskId); if(!task) return;
+    task.done = !task.done;
+    log(t, `Việc "${task.text}" ${task.done ? 'đã hoàn thành' : 'đã mở lại'}`);
+    save(); render();
+  }
+
+  function deleteTank(id){
+    const t = findTank(id); if(!t) return;
+    if(!confirm(`Xóa bể "${t.name}"?`)) return;
+    tanks = tanks.filter(x => x.id !== id);
+    save(); render();
+  }
+
+  function duplicateTank(id){
+    const t = findTank(id); if(!t) return;
+    const copy = makeTank({ ...t, id: undefined, name: t.name + ' (bản sao)' });
+    copy.logs = [`[${new Date().toLocaleString('vi-VN')}] Sao chép từ ${t.name}`, ...t.logs.slice(0,5)];
+    tanks.unshift(copy);
+    save(); render();
+  }
+
+  function exportTank(id){
+    const t = findTank(id); if(!t) return;
+    downloadJSON(`${slugify(t.name)}.json`, t);
+  }
+
+  function quickAdjust(id){
+    const t = findTank(id); if(!t) return;
+    const target = RECOMMEND[t.type] || RECOMMEND['Khác'];
+    const tempRange = parseRange(target.temp);
+    const phRange = parseRange(target.ph);
+    if(tempRange){ t.temp = round1((tempRange.min + tempRange.max)/2); }
+    if(phRange){ t.ph = round1((phRange.min + phRange.max)/2); }
+    t.oxygen = Math.min(100, Math.max(t.oxygen, 75));
+    t.ammo = Math.min(t.ammo, 0.1);
+    t.no2 = Math.min(t.no2, 0.05);
+    t.feed = Math.max(60, t.feed);
+    log(t, 'Tự động cân chỉnh theo thông số khuyến nghị');
+    save(); render();
+  }
+
+  function applySimulation(t){
+    const load = (t.stock / Math.max(1, t.volume)) * 100;
+    t.days += 1;
+    if(t.pump) t.oxygen = Math.min(100, round1(t.oxygen + 0.2)); else t.oxygen = Math.max(0, round1(t.oxygen - 0.6));
+    if(t.air) t.oxygen = Math.min(100, round1(t.oxygen + 0.3));
+    if(t.heater && t.temp < 27) t.temp = round1(t.temp + 0.1);
+    if(!t.heater && t.temp > 26) t.temp = round1(t.temp - 0.03);
+    if(t.light) t.feed = Math.max(0, round1(t.feed - 0.15));
+    t.ammo = round2(Math.max(0, t.ammo + 0.02 + load * 0.001));
+    t.no2 = round2(Math.max(0, t.no2 + 0.01 + load * 0.0008));
+    t.no3 = round1(Math.max(0, t.no3 + 0.05 + load * 0.002));
+    if(t.feed < 25) logOnce(t, 'Thức ăn sắp hết');
+    if(t.oxygen < 40) logOnce(t, '⚠ Oxy thấp');
+    if(t.ammo > 0.25) logOnce(t, '⚠ NH3/NH4 tăng cao');
+    if(t.no2 > 0.2) logOnce(t, '⚠ NO2 tăng cao');
+  }
+
+  function autosim(){
+    setInterval(()=>{
+      let changed = false;
+      tanks.forEach(t=>{
+        applySimulation(t);
+        t.updatedAt = new Date().toISOString();
+        changed = true;
+      });
+      if(changed){ save(); render(); }
+    }, 4000);
+  }
+
+  function evaluateAlerts(t){
+    const alerts = [];
+    if(t.temp < 22 || t.temp > 31) alerts.push('Nhiệt độ lệch');
+    if(t.ph < 6.2 || t.ph > 8.0) alerts.push('pH lệch');
+    if(t.oxygen < 50) alerts.push('Oxy thấp');
+    if(t.ammo > 0.25) alerts.push('NH3 cao');
+    if(t.no2 > 0.2) alerts.push('NO2 cao');
+    if(t.feed < 20) alerts.push('Thức ăn gần hết');
+    return alerts;
+  }
+
+  function statusLevel(t){
+    const a = evaluateAlerts(t);
+    if(a.some(x => /NH3|NO2|Oxy thấp/.test(x))) return 'bad';
+    if(a.length) return 'warn';
+    return 'good';
+  }
+
+  function severityRank(s){
+    return s === 'bad' ? 0 : s === 'warn' ? 1 : 2;
+  }
+
+  function prettyKey(key){
+    const map = {temp:'Nhiệt độ', ph:'pH', oxygen:'Oxy', ammo:'NH3/NH4', no2:'NO2', no3:'NO3', tds:'TDS', feed:'Thức ăn', light:'Đèn', pump:'Máy bơm', heater:'Sưởi', uv:'UV', air:'Sủi oxy', co2:'CO₂'};
+    return map[key] || key;
+  }
+
+  function log(t, text){
+    t.logs.unshift(`[${new Date().toLocaleString('vi-VN')}] ${text}`);
+    if(t.logs.length > 50) t.logs.pop();
+  }
+
+  function logOnce(t, text){
+    const last = t.logs[0] || '';
+    if(last.includes(text)) return;
+    log(t, text);
+  }
+
+  function fmt(v, digits){
+    const n = Number(v);
+    if(!Number.isFinite(n)) return '0';
+    return digits === 0 ? String(Math.round(n)) : n.toFixed(digits);
+  }
+  function round1(n){ return Math.round(n * 10) / 10; }
+  function round2(n){ return Math.round(n * 100) / 100; }
+  function clamp(n, min, max){ return Math.max(min, Math.min(max, Number(n))); }
+  function clampPct(value, min, max){
+    return Math.max(0, Math.min(100, ((Number(value) - min) / (max - min)) * 100));
+  }
+  function clampPctReverse(value, min, max){
+    return 100 - clampPct(value, min, max);
+  }
+  function parseRange(text){
+    const m = String(text).match(/([0-9.]+)\s*[–-]\s*([0-9.]+)/);
+    if(!m) return null;
+    return {min:Number(m[1]), max:Number(m[2])};
+  }
+  function slugify(s){
+    return String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'') || 'be-ca';
+  }
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+  }
+  function downloadJSON(filename, data){
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 1500);
+  }
+  function exportJSON(){
+    downloadJSON(`aquarium_backup_${new Date().toISOString().slice(0,10)}.json`, tanks);
+  }
+  function importJSON(){
+    const file = fileInput.files?.[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      try{
+        const data = JSON.parse(reader.result);
+        const arr = Array.isArray(data) ? data : data.tanks;
+        if(!Array.isArray(arr)) throw new Error('Sai định dạng');
+        tanks = arr.map(t=>makeTank(t));
+        save(); render();
+      }catch(e){
+        alert('Không nhập được file JSON này.');
+      }
+      fileInput.value = '';
+    };
+    reader.readAsText(file);
+  }
+  function downloadTankFile(name, data){
+    downloadJSON(name, data);
+  }
+  function exportCurrent(){ exportJSON(); }
+  function randomBetween(min, max, digits=1){
+    const n = min + Math.random() * (max - min);
+    const p = Math.pow(10, digits);
+    return Math.round(n * p)/p;
+  }
+  function autoCreateTask(){
+    const t = tanks[0];
+    if(!t) return;
+    t.tasks.unshift({id:cryptoId(), text:'Kiểm tra lọc, siphon đáy, kiểm tra nước', done:false, due:''});
+    log(t,'Đã thêm task mẫu');
+    save(); render();
+  }
+
+  // Expose functions for inline handlers
+  window.setValue = setValue;
+  window.toggleDevice = toggleDevice;
+  window.feedTank = feedTank;
+  window.waterChange = waterChange;
+  window.addTask = addTask;
+  window.toggleTask = toggleTask;
+  window.deleteTank = deleteTank;
+  window.openEdit = openEdit;
+  window.duplicateTank = duplicateTank;
+  window.exportTank = exportTank;
+  window.quickAdjust = quickAdjust;
+  window.addTank = addTank;
+
+  // extra global actions for tiện ích
+  window.exportCurrent = exportCurrent;
+  window.autoCreateTask = autoCreateTask;
+
+  function renderRecommendByFilter(){
+    const t = speciesFilter.value !== 'all' ? speciesFilter.value : (tanks[0]?.type || 'Khác');
+    const r = RECOMMEND[t] || RECOMMEND['Khác'];
+    recommendBox.innerHTML = `
+      <div><span class="tag">${escapeHtml(t)}</span></div>
+      <div style="margin-top:10px">Nhiệt độ: <b>${r.temp}</b></div>
+      <div>pH: <b>${r.ph}</b></div>
+      <div>Oxy: <b>${r.oxygen}</b></div>
+      <div>NH3/NH4: <b>${r.ammo}</b></div>
+      <div style="margin-top:10px;color:var(--muted)">Mốc tham khảo nhanh cho bể đang lọc.</div>
+    `;
+  }
+
+  speciesFilter.addEventListener('change', ()=>{ render(); renderRecommendByFilter(); });
+
+})();
+
+
+// =========================
+// HỆ THỐNG THỐNG KÊ NÂNG CAO
+// =========================
+
+const chartCanvas = document.createElement('canvas');
+chartCanvas.width = 1200;
+chartCanvas.height = 300;
+chartCanvas.style.width = '100%';
+chartCanvas.style.marginTop = '20px';
+chartCanvas.style.background = '#071120';
+chartCanvas.style.borderRadius = '20px';
+chartCanvas.style.border = '1px solid #22324d';
+chartCanvas.style.padding = '10px';
+
+const chartPanel = document.createElement('div');
+chartPanel.className = 'panel';
+chartPanel.innerHTML = '<h3>📈 Biểu Đồ Theo Dõi Nhiệt Độ</h3>';
+chartPanel.appendChild(chartCanvas);
+
+document.querySelector('.footer-tools').appendChild(chartPanel);
+
+const chartCtx = chartCanvas.getContext('2d');
+
+let historyData = [];
+
+function updateHistory(){
+
+  const avgTemp =
+    tanks.reduce((s,t)=>s+t.temp,0)
+    /
+    Math.max(1,tanks.length);
+
+  historyData.push(avgTemp);
+
+  if(historyData.length > 40){
+    historyData.shift();
+  }
+
+  drawChart();
+}
+
+function drawChart(){
+
+  chartCtx.clearRect(
+    0,
+    0,
+    chartCanvas.width,
+    chartCanvas.height
+  );
+
+  chartCtx.strokeStyle = '#60a5fa';
+  chartCtx.lineWidth = 3;
+
+  chartCtx.beginPath();
+
+  historyData.forEach((value,index)=>{
+
+    const x =
+      (index/(historyData.length-1))
+      *
+      chartCanvas.width;
+
+    const y =
+      chartCanvas.height
+      -
+      (value/40)
+      *
+      chartCanvas.height;
+
+    if(index == 0){
+      chartCtx.moveTo(x,y);
+    }else{
+      chartCtx.lineTo(x,y);
+    }
+  });
+
+  chartCtx.stroke();
+
+  chartCtx.fillStyle = 'white';
+  chartCtx.font = '16px Arial';
+
+  chartCtx.fillText(
+    'Biến động nhiệt độ trung bình',
+    20,
+    30
+  );
+}
+
+setInterval(updateHistory,3000);
+
+// =========================
+// HỆ THỐNG THÔNG BÁO
+// =========================
+
+function showNotification(text,color='#2563eb'){
+
+  const div = document.createElement('div');
+
+  div.style.position = 'fixed';
+  div.style.bottom = '20px';
+  div.style.right = '20px';
+  div.style.padding = '15px';
+  div.style.borderRadius = '15px';
+  div.style.background = color;
+  div.style.color = 'white';
+  div.style.zIndex = '9999';
+  div.style.boxShadow = '0 10px 30px rgba(0,0,0,0.5)';
+  div.style.fontWeight = 'bold';
+  div.innerText = text;
+
+  document.body.appendChild(div);
+
+  setTimeout(()=>{
+    div.remove();
+  },3000);
+}
+
+setInterval(()=>{
+
+  tanks.forEach(tank=>{
+
+    if(tank.ammo > 0.3){
+
+      showNotification(
+        '⚠ NH3 cao ở ' + tank.name,
+        '#dc2626'
+      );
+    }
+
+    if(tank.oxygen < 45){
+
+      showNotification(
+        '⚠ Oxy thấp ở ' + tank.name,
+        '#f59e0b'
+      );
+    }
+
+  });
+
+},7000);
+
+// =========================
+// HỆ THỐNG CHO ĂN TỰ ĐỘNG
+// =========================
+
+const autoFeedPanel = document.createElement('div');
+
+autoFeedPanel.className = 'panel';
+
+autoFeedPanel.innerHTML = `
+
+<h3>🤖 Cho Ăn Tự Động</h3>
+
+<div class="row">
+
+  <input
+    type="number"
+    id="feedInterval"
+    placeholder="Phút"
+    value="1"
+  >
+
+  <button
+    class="btn-green"
+    onclick="startAutoFeed()"
+  >
+    Bắt Đầu
+  </button>
+
+  <button
+    class="btn-red"
+    onclick="stopAutoFeed()"
+  >
+    Dừng
+  </button>
+
+</div>
+
+<div class="tiny" style="margin-top:10px">
+  Tự động tăng thức ăn cho tất cả bể
+</div>
+
+`;
+
+document.querySelector('.footer-tools')
+.appendChild(autoFeedPanel);
+
+let autoFeedTimer = null;
+
+window.startAutoFeed = function(){
+
+  const minutes =
+    parseInt(
+      document.getElementById(
+        'feedInterval'
+      ).value
+    );
+
+  stopAutoFeed();
+
+  autoFeedTimer = setInterval(()=>{
+
+    tanks.forEach(t=>{
+
+      t.feed = 100;
+
+      log(
+        t,
+        '🤖 Auto feeder hoạt động'
+      );
+    });
+
+    save();
+    render();
+
+    showNotification(
+      '🤖 Đã cho ăn tự động',
+      '#16a34a'
+    );
+
+  },minutes*60000);
+
+  showNotification(
+    'Đã bật auto feed',
+    '#2563eb'
+  );
+}
+
+window.stopAutoFeed = function(){
+
+  clearInterval(autoFeedTimer);
+
+  showNotification(
+    'Đã tắt auto feed',
+    '#dc2626'
+  );
+}
+
+// =========================
+// ĐỒNG HỒ THỜI GIAN THỰC
+// =========================
+
+const clock = document.createElement('div');
+
+clock.style.position = 'fixed';
+clock.style.top = '20px';
+clock.style.right = '20px';
+clock.style.background = '#071120';
+clock.style.padding = '12px 18px';
+clock.style.borderRadius = '15px';
+clock.style.border = '1px solid #22324d';
+clock.style.fontWeight = 'bold';
+clock.style.zIndex = '999';
+
+function updateClock(){
+
+  const now = new Date();
+
+  clock.innerHTML =
+    '🕒 '
+    +
+    now.toLocaleTimeString();
+}
+
+setInterval(updateClock,1000);
+
+updateClock();
+
+document.body.appendChild(clock);
+
+// =========================
+// DARK / LIGHT MODE
+// =========================
+
+const themeBtn = document.createElement('button');
+
+themeBtn.innerText = '🌗 Đổi Theme';
+
+themeBtn.className = 'btn-dark';
+
+themeBtn.style.position = 'fixed';
+themeBtn.style.bottom = '20px';
+themeBtn.style.left = '20px';
+themeBtn.style.zIndex = '999';
+
+document.body.appendChild(themeBtn);
+
+let darkMode = true;
+
+themeBtn.onclick = ()=>{
+
+  darkMode = !darkMode;
+
+  if(darkMode){
+
+    document.body.style.background =
+      'linear-gradient(180deg,#06101d 0%,#081427 100%)';
+
+    document.body.style.color = 'white';
+
+  }else{
+
+    document.body.style.background = '#dbeafe';
+
+    document.body.style.color = '#111827';
+  }
+}
+
+// =========================
+// HỆ THỐNG ÂM THANH
+// =========================
+
+function beep(){
+
+  const audioCtx =
+    new (
+      window.AudioContext
+      ||
+      window.webkitAudioContext
+    )();
+
+  const oscillator =
+    audioCtx.createOscillator();
+
+  oscillator.type = 'sine';
+  oscillator.frequency.value = 600;
+
+  oscillator.connect(
+    audioCtx.destination
+  );
+
+  oscillator.start();
+
+  setTimeout(()=>{
+
+    oscillator.stop();
+
+  },150);
+}
+
+setInterval(()=>{
+
+  tanks.forEach(t=>{
+
+    if(t.ammo > 0.4){
+
+      beep();
+    }
+  });
+
+},5000);
+
+// =========================
+// HỆ THỐNG THỜI TIẾT GIẢ
+// =========================
+
+const weatherPanel = document.createElement('div');
+
+weatherPanel.className = 'panel';
+
+weatherPanel.innerHTML = `
+
+<h3>☁ Môi Trường</h3>
+
+<div id="weatherInfo">
+  Đang tải...
+</div>
+
+`;
+
+document.querySelector('.footer-tools')
+.appendChild(weatherPanel);
+
+const weatherTypes = [
+  '☀ Nắng',
+  '🌧 Mưa',
+  '⛅ Có mây',
+  '🌩 Giông'
+];
+
+function updateWeather(){
+
+  const temp =
+    25 + Math.floor(Math.random()*8);
+
+  const weather =
+    weatherTypes[
+      Math.floor(
+        Math.random()*weatherTypes.length
+      )
+    ];
+
+  document.getElementById(
+    'weatherInfo'
+  ).innerHTML = `
+
+    <div style="font-size:30px">
+      ${weather}
+    </div>
+
+    <div style="margin-top:10px">
+      Nhiệt độ ngoài trời: ${temp}°C
+    </div>
+
+  `;
+}
+
+setInterval(updateWeather,5000);
+
+updateWeather();
+
+// =========================
+// HỆ THỐNG FPS WATER EFFECT
+// =========================
+
+const waterEffect = document.createElement('div');
+
+waterEffect.style.position = 'fixed';
+waterEffect.style.left = '0';
+waterEffect.style.bottom = '0';
+waterEffect.style.width = '100%';
+waterEffect.style.height = '120px';
+waterEffect.style.pointerEvents = 'none';
+waterEffect.style.background =
+'linear-gradient(to top,rgba(14,165,233,0.25),transparent)';
+waterEffect.style.animation = 'wave 4s infinite ease-in-out';
+
+const style = document.createElement('style');
+
+style.innerHTML = `
+
+@keyframes wave{
+
+  0%{
+    transform:translateY(0px);
+  }
+
+  50%{
+    transform:translateY(-10px);
+  }
+
+  100%{
+    transform:translateY(0px);
+  }
+
+}
+
+`;
+
+document.head.appendChild(style);
+
+document.body.appendChild(waterEffect);
+
+</script>
+</body>
+</html>
